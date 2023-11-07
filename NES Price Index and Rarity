@@ -1,0 +1,44 @@
+from flask import Flask, request, jsonify
+import requests
+
+app = Flask(__name__)
+
+# API endpoints
+@app.route('/nes_game/<game_title>', methods=['GET'])
+def get_nes_game_info(game_title):
+    # Make requests to external sources to fetch price and rarity data
+    price_data = fetch_price_from_external_source(game_title)
+    rarity_data = fetch_rarity_from_external_source(game_title)
+
+    if price_data and rarity_data:
+        game_info = {
+            'title': game_title,
+            'price': price_data,
+            'rarity': rarity_data
+        }
+        return jsonify({'NESGameInfo': game_info})
+    else:
+        return jsonify({'message': 'NES Game not found'}, 404)
+
+def fetch_price_from_external_source(game_title):
+    # Make a request to an external API to get price data
+    # Replace 'your_price_api_url' with the actual API endpoint
+    price_api_url = 'your_price_api_url'
+    response = requests.get(price_api_url, params={'title': game_title})
+    if response.status_code == 200:
+        price_data = response.json()
+        return price_data.get('price')
+    return None
+
+def fetch_rarity_from_external_source(game_title):
+    # Make a request to an external API to get rarity data
+    # Replace 'your_rarity_api_url' with the actual API endpoint
+    rarity_api_url = 'your_rarity_api_url'
+    response = requests.get(rarity_api_url, params={'title': game_title})
+    if response.status_code == 200:
+        rarity_data = response.json()
+        return rarity_data.get('rarity')
+    return None
+
+if __name__ == '__main__':
+    app.run(debug=True)
